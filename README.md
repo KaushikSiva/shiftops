@@ -136,18 +136,6 @@ The recording uses the actual browser and writes a scene timeline under
 `artifacts/live-demo/`. It requires the frontend dependencies and Playwright
 Chromium installed as above.
 
-## Existing work and hackathon work
-
-Reused from the author's **G1 Street Wise** project: the Unitree robot URDF/STLs,
-the frozen locomotion-policy weights exported as NumPy arrays, and the NumPy LSTM
-executor. Their reuse is disclosed, not presented as new model training.
-
-New here: the enterprise operations workflow, SQLite approval/resource ledger,
-facility route planner and scene, persistent physics/checkpoint worker, REST/SSE
-API, operator interface, replay/export, tests and Vultr deployment package.
-
-See [third-party notices](THIRD_PARTY_NOTICES.md), [demo script](docs/DEMO_SCRIPT.md),
-[submission checklist](docs/SUBMISSION.md) and [build/evidence plan](docs/BUILD_PLAN.md).
 
 ## Demo boundaries
 
