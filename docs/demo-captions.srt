@@ -13,17 +13,17 @@ Robot motion comes from live CPU MuJoCo physics
 Pause and resume with persisted robot state
 
 4
-00:00:19,000 --> 00:00:27,000
+00:00:26,000 --> 00:00:32,000
 Review the simulated equipment reading and parts proposal
 No work order exists before approval
 
 5
-00:00:27,000 --> 00:00:34,000
+00:00:32,000 --> 00:00:37,000
 Approval commits a work order and one stock reservation
 Handoff complete · repair still pending
 
 6
-00:00:34,000 --> 00:00:43,000
+00:00:37,000 --> 00:00:43,000
 Inspect the audit trail and replay recorded robot poses
 
 7

@@ -40,7 +40,7 @@ An actual container restart during navigation:
 
 The container test ran locally on Linux ARM64 via Docker Desktop. It does not prove
 Vultr hosting or Linux AMD64 execution. CI exercises the portable Python/backend
-suite on GitHub's Linux runner.
+suite on GitHub's Linux runner. [The first Linux AMD64 CI run passed](https://github.com/KaushikSiva/shiftops/actions/runs/36289223571), including all nine tests and the frontend build.
 
 ## Still required
 

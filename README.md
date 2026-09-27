@@ -7,6 +7,8 @@ A Unitree G1 navigates a CPU MuJoCo facility twin, inspects a simulated equipmen
 alert, checks inventory, and prepares a maintenance handoff. An operator reviews
 the evidence before a work order and parts reservation are committed together.
 
+[Source repository](https://github.com/KaushikSiva/shiftops) · [Watch/download the 46-second local demo](https://github.com/KaushikSiva/shiftops/releases/download/v0.1.0-local-preview/shiftops-demo.mp4) · [Verified Linux CI](https://github.com/KaushikSiva/shiftops/actions/runs/36289223571)
+
 **Deployment status:** local implementation; public Vultr URL pending a configured
 Vultr VM. No public cloud deployment is claimed until independently verified.
 

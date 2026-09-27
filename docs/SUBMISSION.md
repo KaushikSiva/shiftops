@@ -4,10 +4,11 @@
 ShiftOps — embodied facility operations from incident to approved maintenance handoff.
 
 ## Required deliverables
-- [ ] Public GitHub repository URL (fill after publication)
+- [x] Public GitHub repository: https://github.com/KaushikSiva/shiftops
 - [ ] Vultr VM instance ID and provider evidence (pending VM access)
 - [ ] Public browser demo URL (pending deployment)
-- [ ] Recorded demo video URL (record actual application, then publish)
+- [x] Recorded local demo video: https://github.com/KaushikSiva/shiftops/releases/download/v0.1.0-local-preview/shiftops-demo.mp4
+- [ ] Final video against the deployed public URL
 - [x] Setup documentation and architecture
 - [x] Multi-step operational workflow and enterprise-style web UI
 - [x] CPU simulation/digital twin integration with existing G1 assets
