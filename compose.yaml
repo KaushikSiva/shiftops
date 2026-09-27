@@ -1,0 +1,37 @@
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    environment:
+      SHIFTOPS_DEPLOYMENT: ${SHIFTOPS_DEPLOYMENT:-local-container}
+      SHIFTOPS_TICK_SECONDS: "0.06"
+    volumes:
+      - operations:/app/data
+    mem_limit: 1536m
+    cpus: 2
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+  proxy:
+    image: caddy:2.10-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-:80}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - certificates:/data
+      - caddy_config:/config
+    depends_on:
+      app:
+        condition: service_healthy
+volumes:
+  operations:
+  certificates:
+  caddy_config:

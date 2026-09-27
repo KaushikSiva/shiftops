@@ -1,0 +1,8 @@
+ShiftOps turns a facility alert into accountable maintenance work.
+This local demo uses our existing Unitree G1 controller in a live CPU physics simulation.
+An air-handler alert starts an inspection. The backend plans around a blocked aisle and records the robot's progress.
+An operator can pause the run. Its state is saved, and the inspection resumes from that checkpoint.
+At the equipment, ShiftOps records a simulated sensor reading, checks inventory, and requests approval.
+Only approval creates the work order and reserves a part. The repair remains pending.
+Every decision is recorded, and the actual robot trajectory can be replayed or exported.
+The application is packaged for a Vultr VM. Public deployment is the remaining step.
