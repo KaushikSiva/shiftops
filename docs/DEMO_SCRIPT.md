@@ -1,38 +1,31 @@
-# Three-minute demonstration
+# Public deployment demonstration
 
-Record the actual browser. Do not label localhost as a Vultr deployment.
+[Watch the 2-minute-35-second demo](https://github.com/KaushikSiva/shiftops/releases/download/v1.0.0/shiftops-vultr-demo.mp4)
 
-**0:00–0:20 — Problem.** "A facility alert usually becomes a chain of messages:
-find someone to inspect it, locate a replacement part, chase approval, and create
-a work order. ShiftOps connects that chain to a robot inspection."
+Recorded from https://shiftops.104-156-229-254.sslip.io on 2026-09-27.
+Footage shows actual browser operations on the Vultr deployment, with scripted
+Samantha narration and scene captions. The recording covers two complete workflows.
 
-**0:20–0:35 — Dispatch.** Open New inspection. Select air-handler overheating,
-leave the loading aisle blocked, and dispatch. "This G1 uses our existing learned
-gait inside a live CPU physics simulation. The VM owns the route and operation."
+| Start | Scene |
+| --- | --- |
+| 0:00 | Live on Vultr · ShiftOps facility operations |
+| 0:12 | Dispatch an air-handler inspection |
+| 0:20 | Live MuJoCo physics · existing learned G1 gait |
+| 0:27 | Pause retains the robot and controller checkpoint |
+| 0:35 | Resume from durable state |
+| 0:47 | Review evidence and the proposed parts reservation |
+| 1:03 | Approval commits the handoff · repair remains pending |
+| 1:12 | Durable decisions and downloadable evidence |
+| 1:22 | Replay actual recorded robot poses |
+| 1:36 | An exception: the replacement filter is out of stock |
+| 2:04 | Stockout becomes a purchase request |
+| 2:15 | Purchasing review queued · no external order sent |
+| 2:23 | Vultr runs the app, workflow, physics and records |
 
-**0:35–1:05 — Observe.** Follow the robot as it routes around the marked obstacle.
-Briefly pause and resume. "Every pose and mission checkpoint is persisted. A
-stability or collision fault stops execution. This is a digital twin, not physical
-hardware."
+The equipment readings and warehouse inventory are simulated. The G1 model and
+learned gait are reused from the existing robotics project; the facility workflow,
+approval ledger, operations UI and deployed backend are new hackathon work.
 
-**1:05–1:35 — Review.** Show the measured robot arrival and simulated equipment
-reading. "The equipment sensor is simulated. The workflow checks the threshold,
-looks up inventory, and proposes a part reservation. It cannot authorize itself."
-
-**1:35–1:55 — Approve.** Approve the handoff, open Work orders. "The approval,
-reservation and work order are committed together. Retry cannot reserve twice.
-Handoff complete means maintenance work is queued; it does not mean a repair."
-
-**1:55–2:20 — Evidence.** Open Activity log, expand an event, download evidence and
-replay the recorded trajectory. "An operator can reconstruct why this happened."
-
-**2:20–2:45 — Exception.** Start the out-of-stock filter scenario. Show purchase
-request pending after approval. "No external purchase is sent. The same workflow
-handles exceptions without inventing inventory."
-
-**2:45–3:00 — Infrastructure.** Open System overview and the live health endpoint.
-When deployed, show the Vultr VM console and public URL. "Vultr runs the physics,
-orchestration, API, web app and system of record. One CPU VM; no GPU required."
-
-Use actual observed run timings. Never claim unmeasured labor savings or invented
-customer adoption. Explain inherited robot assets and new hackathon work clearly.
+The work-order handoff does not claim a completed repair, and the stockout workflow
+does not send an order to an external vendor. See [recording evidence](validation/recording-vultr.json)
+for the exact duration, scene timing, scenario IDs and video hash.

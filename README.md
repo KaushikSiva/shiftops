@@ -7,12 +7,14 @@ A Unitree G1 navigates a CPU MuJoCo facility twin, inspects a simulated equipmen
 alert, checks inventory, and prepares a maintenance handoff. An operator reviews
 the evidence before a work order and parts reservation are committed together.
 
-[Source repository](https://github.com/KaushikSiva/shiftops) · [Watch/download the 46-second local demo](https://github.com/KaushikSiva/shiftops/releases/download/v0.1.0-local-preview/shiftops-demo.mp4) · [Verified Linux CI](https://github.com/KaushikSiva/shiftops/actions/runs/36289223571)
+[Open the live app](https://shiftops.104-156-229-254.sslip.io) · [Watch the public deployment demo](https://github.com/KaushikSiva/shiftops/releases/download/v1.0.0/shiftops-vultr-demo.mp4) · [Verified Linux CI](https://github.com/KaushikSiva/shiftops/actions/runs/36290083728)
 
-**Deployment status:** local implementation; public Vultr URL pending a configured
-Vultr VM. No public cloud deployment is claimed until independently verified.
+**Live on Vultr:** a Silicon Valley CPU VM runs the web application, API, workflow,
+MuJoCo and SQLite. Public HTTPS, all 16 browser checks, approval/stock accounting,
+and persistence across two container restarts have been verified. See
+[deployment evidence](docs/DEPLOYMENT.md) and the [submission package](docs/SUBMISSION.md).
 
-![Live G1 inspection awaiting operator approval](docs/media/desktop-approval.png)
+![Public Vultr app awaiting operator approval](docs/media/desktop-approval-vultr.png)
 
 ## Run locally
 
@@ -123,6 +125,16 @@ inventory accounting, idempotency, isolation, cancellation, pause/resume races
 and restart recovery.
 Browser checks exercise intake, live movement, approval, work orders, replay and
 mobile layout. Generated screenshots, videos and reports live in `artifacts/`.
+
+To record the full public walkthrough, including the stockout exception:
+
+```sh
+SHIFTOPS_URL=https://shiftops.104-156-229-254.sslip.io node scripts/record-demo.mjs
+```
+
+The recording uses the actual browser and writes a scene timeline under
+`artifacts/live-demo/`. It requires the frontend dependencies and Playwright
+Chromium installed as above.
 
 ## Existing work and hackathon work
 

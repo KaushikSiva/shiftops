@@ -1,0 +1,26 @@
+{
+  "base": "https://shiftops.104-156-229-254.sslip.io",
+  "started": "2026-09-27T08:50:01.373Z",
+  "checks": [
+    "live CPU inspection",
+    "pause freezes persisted pose",
+    "resume reaches inspection",
+    "approval required",
+    "work order created",
+    "single inventory reservation",
+    "evidence download",
+    "activity events",
+    "recorded pose replay",
+    "state survives browser reload",
+    "mobile viewport has no horizontal overflow",
+    "mobile intake dialog",
+    "mobile cancellation retains evidence and inventory",
+    "canceled run persists after reload",
+    "paused and canceled workflow labels reflect actual state",
+    "no browser errors"
+  ],
+  "status": "passed",
+  "mission": "4bbc7321880d",
+  "errors": [],
+  "consoleErrors": []
+}

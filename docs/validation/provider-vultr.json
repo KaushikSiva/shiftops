@@ -1,0 +1,74 @@
+{
+  "checked_at": "2026-09-27T08:48:33.719474+00:00",
+  "url": "https://shiftops.104-156-229-254.sslip.io",
+  "provider_api": "https://api.vultr.com/v2/instances/d6fa84e7-0877-4ae1-926d-29fc2719435c",
+  "instance": {
+    "id": "d6fa84e7-0877-4ae1-926d-29fc2719435c",
+    "label": "shiftops-agent-arena",
+    "hostname": "shiftops",
+    "region": "sjc",
+    "plan": "vhp-2c-4gb-amd",
+    "os": "Ubuntu 24.04 LTS x64",
+    "ram": 4096,
+    "vcpu_count": 2,
+    "disk": 100,
+    "main_ip": "104.156.229.254",
+    "status": "active",
+    "power_status": "running",
+    "server_status": "ok",
+    "date_created": "2026-09-27T08:43:28+00:00"
+  },
+  "vm": {
+    "vendor": "Vultr",
+    "product": "VHP",
+    "commit": "4773d610343a6a1273d07234d62c9d181918e29c",
+    "container_user": "10001",
+    "container": {
+      "ReadonlyRootfs": true,
+      "Memory": 1610612736,
+      "NanoCpus": 2000000000,
+      "CapDrop": [
+        "ALL"
+      ]
+    }
+  },
+  "tls": {
+    "issuer": [
+      [
+        [
+          "countryName",
+          "US"
+        ]
+      ],
+      [
+        [
+          "organizationName",
+          "Let's Encrypt"
+        ]
+      ],
+      [
+        [
+          "commonName",
+          "YE1"
+        ]
+      ]
+    ],
+    "subject": [
+      [
+        [
+          "commonName",
+          "shiftops.104-156-229-254.sslip.io"
+        ]
+      ]
+    ],
+    "not_before": "Sep 27 07:48:13 2026 GMT",
+    "not_after": "Dec 26 07:48:12 2026 GMT",
+    "hostname_verified": true
+  },
+  "pricing": {
+    "monthly_usd": 24,
+    "hourly_usd": 0.033,
+    "automatic_backups": false,
+    "optional_paid_addons": false
+  }
+}

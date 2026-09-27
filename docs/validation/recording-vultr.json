@@ -1,0 +1,99 @@
+{
+  "public_url": "https://shiftops.104-156-229-254.sslip.io",
+  "recorded_at": "2026-09-27T08:55:12.082Z",
+  "duration_seconds": 154.507,
+  "video_url": "https://github.com/KaushikSiva/shiftops/releases/download/v1.0.0/shiftops-vultr-demo.mp4",
+  "sha256": "57d95c07d063761c3f534418d9341c86af94cf53f5b63c348c3b3177d1b032f7",
+  "bytes": 5862426,
+  "footage": "Actual browser session against public Vultr deployment",
+  "narration": "Generated Samantha voice, scripted from demonstrated behavior",
+  "scenario_missions": [
+    "0523aef5811b",
+    "053768f9edf5"
+  ],
+  "created_work_orders": [
+    "WO-0523AE",
+    "WO-053768"
+  ],
+  "status": "passed",
+  "scenes": [
+    {
+      "title": "Live on Vultr \u00b7 ShiftOps facility operations",
+      "start": 0.0,
+      "end": 11.887,
+      "speech_seconds": 7.800045
+    },
+    {
+      "title": "Dispatch an air-handler inspection",
+      "start": 11.887,
+      "end": 20.13,
+      "speech_seconds": 3.148481
+    },
+    {
+      "title": "Live MuJoCo physics \u00b7 existing learned G1 gait",
+      "start": 20.13,
+      "end": 26.866000000000003,
+      "speech_seconds": 4.737324
+    },
+    {
+      "title": "Pause retains the robot and controller checkpoint",
+      "start": 26.866000000000003,
+      "end": 34.562,
+      "speech_seconds": 2.739864
+    },
+    {
+      "title": "Resume from durable state",
+      "start": 34.562,
+      "end": 47.42100000000001,
+      "speech_seconds": 5.7078
+    },
+    {
+      "title": "Review evidence and the proposed parts reservation",
+      "start": 47.42100000000001,
+      "end": 62.873999999999995,
+      "speech_seconds": 6.612789
+    },
+    {
+      "title": "Approval commits the handoff \u00b7 repair remains pending",
+      "start": 62.873999999999995,
+      "end": 71.955,
+      "speech_seconds": 4.973968
+    },
+    {
+      "title": "Durable decisions and downloadable evidence",
+      "start": 71.955,
+      "end": 81.68299999999999,
+      "speech_seconds": 4.3039
+    },
+    {
+      "title": "Replay actual recorded robot poses",
+      "start": 81.68299999999999,
+      "end": 96.044,
+      "speech_seconds": 4.047574
+    },
+    {
+      "title": "An exception: the replacement filter is out of stock",
+      "start": 96.044,
+      "end": 124.035,
+      "speech_seconds": 5.503583
+    },
+    {
+      "title": "Stockout becomes a purchase request",
+      "start": 124.035,
+      "end": 135.344,
+      "speech_seconds": 3.624626
+    },
+    {
+      "title": "Purchasing review queued \u00b7 no external order sent",
+      "start": 135.344,
+      "end": 142.504,
+      "speech_seconds": 3.839546
+    },
+    {
+      "title": "Vultr runs the app, workflow, physics and records",
+      "start": 142.504,
+      "end": 154.507,
+      "speech_seconds": 9.779728
+    }
+  ]
+}

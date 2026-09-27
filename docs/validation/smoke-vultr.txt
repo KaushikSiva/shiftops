@@ -1,0 +1,9 @@
+Health: {'ok': True, 'service': 'ShiftOps', 'storage': 'SQLite WAL', 'physics': 'MuJoCo CPU / NumPy gait', 'deployment': 'vultr', 'simulation_only': True}
+{
+  "url": "https://shiftops.104-156-229-254.sslip.io",
+  "mission": "109e494d23cf",
+  "order": "WO-109E49",
+  "frames": 199,
+  "contacts": 0,
+  "status": "passed"
+}

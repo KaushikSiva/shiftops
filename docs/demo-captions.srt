@@ -1,31 +1,53 @@
 1
-00:00:00,000 --> 00:00:05,000
-ShiftOps — facility operations with a G1 digital twin
-Recorded local application · simulated facility
+00:00:00,000 --> 00:00:11,887
+Live on Vultr · ShiftOps facility operations
+https://shiftops.104-156-229-254.sslip.io
 
 2
-00:00:05,000 --> 00:00:12,000
-Dispatch an inspection around a blocked aisle
-Robot motion comes from live CPU MuJoCo physics
+00:00:11,887 --> 00:00:20,130
+Dispatch an air-handler inspection
 
 3
-00:00:12,000 --> 00:00:19,000
-Pause and resume with persisted robot state
+00:00:20,130 --> 00:00:26,866
+Live MuJoCo physics · existing learned G1 gait
 
 4
-00:00:26,000 --> 00:00:32,000
-Review the simulated equipment reading and parts proposal
-No work order exists before approval
+00:00:26,866 --> 00:00:34,562
+Pause retains the robot and controller checkpoint
 
 5
-00:00:32,000 --> 00:00:37,000
-Approval commits a work order and one stock reservation
-Handoff complete · repair still pending
+00:00:34,562 --> 00:00:47,421
+Resume from durable state
 
 6
-00:00:37,000 --> 00:00:43,000
-Inspect the audit trail and replay recorded robot poses
+00:00:47,421 --> 00:01:02,874
+Review evidence and the proposed parts reservation
 
 7
-00:00:43,000 --> 00:00:46,000
-Packaged for Vultr · public VM deployment pending
+00:01:02,874 --> 00:01:11,955
+Approval commits the handoff · repair remains pending
+
+8
+00:01:11,955 --> 00:01:21,683
+Durable decisions and downloadable evidence
+
+9
+00:01:21,683 --> 00:01:36,044
+Replay actual recorded robot poses
+
+10
+00:01:36,044 --> 00:02:04,035
+An exception: the replacement filter is out of stock
+
+11
+00:02:04,035 --> 00:02:15,344
+Stockout becomes a purchase request
+
+12
+00:02:15,344 --> 00:02:22,504
+Purchasing review queued · no external order sent
+
+13
+00:02:22,504 --> 00:02:34,507
+Vultr runs the app, workflow, physics and records
+https://shiftops.104-156-229-254.sslip.io

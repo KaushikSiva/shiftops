@@ -1,0 +1,16 @@
+{
+  "base": "https://shiftops.104-156-229-254.sslip.io",
+  "deployment": "vultr",
+  "checks": [
+    "Public HTTPS with a trusted certificate and proxy headers",
+    "same-origin writes and secure HttpOnly session cookie",
+    "foreign-origin writes and oversized requests rejected through proxy",
+    "two live SSE snapshots delivered without proxy buffering",
+    "container restart pauses at recorded checkpoint and resumes to inspection",
+    "approved work order and single reservation survive second restart"
+  ],
+  "status": "passed",
+  "mission": "6230134321ae",
+  "order": "WO-623013",
+  "contacts": 0
+}

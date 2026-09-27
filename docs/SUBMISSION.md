@@ -5,10 +5,10 @@ ShiftOps — embodied facility operations from incident to approved maintenance 
 
 ## Required deliverables
 - [x] Public GitHub repository: https://github.com/KaushikSiva/shiftops
-- [ ] Vultr VM instance ID and provider evidence (pending VM access)
-- [ ] Public browser demo URL (pending deployment)
+- [x] Vultr VM: `d6fa84e7-0877-4ae1-926d-29fc2719435c`, Silicon Valley. [Provider evidence](validation/provider-vultr.json).
+- [x] Public browser demo: https://shiftops.104-156-229-254.sslip.io
 - [x] Recorded local demo video: https://github.com/KaushikSiva/shiftops/releases/download/v0.1.0-local-preview/shiftops-demo.mp4
-- [ ] Final video against the deployed public URL
+- [x] Final public-deployment video (2:35): https://github.com/KaushikSiva/shiftops/releases/download/v1.0.0/shiftops-vultr-demo.mp4
 - [x] Setup documentation and architecture
 - [x] Multi-step operational workflow and enterprise-style web UI
 - [x] CPU simulation/digital twin integration with existing G1 assets
@@ -19,10 +19,11 @@ resume → inspect evidence → approve → verify work order and reserved stock
 replay/download evidence. Then use the filter scenario to demonstrate a stockout.
 
 ## Cloud verification
-The deployed Vultr VM must serve the frontend, API, database and workflow/physics
-worker. A tunnel to a laptop or static frontend hosted elsewhere does not satisfy
-this project's deployment claim. Run the public smoke test, restart the app and
-verify durable state, and capture console proof with secrets redacted.
+The Vultr VM serves the frontend, API, database and workflow/physics worker.
+Public browser tests and the HTTP smoke test passed. Two real container restarts
+verified recovery of an in-flight checkpoint and persistence of the approved order
+and inventory. [Verification reports](VALIDATION.md) include provider metadata,
+trusted HTTPS, the deployed commit and the public walkthrough results.
 
 ## Disclosure
 Robot model, gait weights and NumPy executor predate this hackathon. The operations

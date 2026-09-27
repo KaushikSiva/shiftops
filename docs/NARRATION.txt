@@ -1,8 +1,13 @@
-ShiftOps turns a facility alert into accountable maintenance work.
-This local demo uses our existing Unitree G1 controller in a live CPU physics simulation.
-An air-handler alert starts an inspection. The backend plans around a blocked aisle and records the robot's progress.
-An operator can pause the run. Its state is saved, and the inspection resumes from that checkpoint.
-At the equipment, ShiftOps records a simulated sensor reading, checks inventory, and requests approval.
-Only approval creates the work order and reserves a part. The repair remains pending.
-Every decision is recorded, and the actual robot trajectory can be replayed or exported.
-The application is packaged for a Vultr VM. Public deployment is the remaining step.
+ShiftOps turns an equipment alert into accountable maintenance work. This is the live application on a Vultr CPU virtual machine.
+Start with an overheating air handler and a blocked aisle.
+The backend plans a route and drives our existing G1 gait in real CPU physics.
+Pause saves the robot and controller checkpoint.
+Resuming continues from that saved state. Every recorded pose lives on the Vultr virtual machine.
+At the inspection point, simulated equipment readings trigger an inventory check and a proposed maintenance handoff.
+Only your approval creates a work order and reserves a part. The repair remains pending.
+Every decision has a durable audit record, with downloadable evidence.
+Replay shows the actual robot poses recorded during the inspection.
+The same workflow handles exceptions. A filter replacement needs a part that is out of stock.
+With no stock, the proposal becomes a purchase request.
+Approval queues purchasing review. No external order is sent.
+Vultr runs the web app, API, workflow, CPU simulation, and SQLite system of record. Existing robot assets are clearly disclosed.

@@ -1,6 +1,31 @@
 # Validation evidence
 
-Measured locally on 2026-09-26. Deployment on Vultr is not yet verified.
+Local checks were measured on 2026-09-26. The public Vultr deployment was verified
+on 2026-09-27 at https://shiftops.104-156-229-254.sslip.io.
+
+## Public Vultr verification
+
+- [Provider evidence](validation/provider-vultr.json): the Vultr API identifies
+  instance `d6fa84e7-0877-4ae1-926d-29fc2719435c` in `sjc`; the VM reports Vultr
+  as its hardware vendor. Runtime commit: `4773d610343a6a1273d07234d62c9d181918e29c`.
+- [External smoke test](validation/smoke-vultr.txt): an actual CPU inspection,
+  199 recorded poses, zero obstacle contacts, and one approved work order with
+  one bearing reservation, including a repeated approval request.
+- [Public browser report](validation/browser-vultr.json): all 16 desktop/mobile
+  checks passed with no browser errors, including pause/resume, cancellation,
+  evidence export, replay and persistent reload.
+- [Restart report](validation/persistence-vultr.json): an in-flight run recovered
+  paused at the last recorded pose, resumed to inspection and retained its approved
+  order and inventory through another restart. HTTPS, secure cookies, request
+  limits, same-origin enforcement and unbuffered SSE also passed on the public VM.
+- [Linux CI](https://github.com/KaushikSiva/shiftops/actions/runs/36290083728):
+  19 backend tests, the frontend build and all 16 browser checks passed.
+
+- [Public recording](validation/recording-vultr.json): two complete scenarios,
+  including the stockout purchase request, captured from the deployed browser.
+
+The browser renderer runs on the visitor's device; all simulation, workflow
+decisions and persisted operations run on the Vultr VM.
 
 ## Backend and physics
 
@@ -64,13 +89,13 @@ HTTPS with Caddy's local CA trusted explicitly by the test client. The
 - Explicit resume reaches inspection with zero obstacle contacts.
 - One approved work order and one inventory reservation persist after a second restart.
 
-This is a local deployment rehearsal; public DNS, public certificate issuance and
-Vultr hosting still require verification on the actual VM. CI now also runs the
-browser walkthrough and uploads its report/screenshots for review.
+This local rehearsal did not establish public DNS, public certificate issuance or
+Vultr hosting. Those are now covered by the public verification above. CI also runs
+the browser walkthrough and uploads its report/screenshots for review.
 
-## Still required
+## Limits of this evidence
 
-- A configured Vultr VM, public hostname/URL and provider evidence.
-- Public endpoint smoke test plus deployed persistence check.
-- Rerecord the final judging video against that public deployment.
-- Review event rules concerning previously built robot assets.
+These checks verify an operational hackathon deployment, not a production SLA or
+physical-robot safety certification. Robot assets are reused and disclosed;
+equipment sensors, inventory and purchasing are simulation data. Event eligibility
+and judging outcomes are not determined by application tests.

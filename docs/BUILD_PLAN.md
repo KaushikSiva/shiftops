@@ -19,4 +19,6 @@ Interaction thesis: interpolate actual server robot poses; animate route changes
 - Deployment: independently GET public health, assets, create/approve demo mission, restart container and verify persisted records.
 - Demo video of actual browser flow; README links to live deployment and evidence.
 
-Deployment is pending a configured Vultr host/account. Winning is a judging outcome; do not assert guaranteed results or invented ratings.
+Deployment and public verification completed on 2026-09-27; see
+`DEPLOYMENT.md` and `validation/`. Winning is a judging outcome; do not assert
+guaranteed results or invented ratings.
