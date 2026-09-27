@@ -1,12 +1,14 @@
 import asyncio
 import json
 import math
+import threading
 import uuid
 
 import pytest
 from fastapi.testclient import TestClient
 from backend.app import create_app
 from backend.facility import HOME, SCENARIOS, plan, line_clear
+from backend.physics import Twin
 
 
 @pytest.fixture
@@ -56,6 +58,7 @@ def test_real_physics_to_approved_work_order(app, client, scenario):
     assert first.status_code == 200
     again = client.post(f"/api/missions/{m['id']}/decision", json={"action": "approve"})
     assert again.json() == first.json()
+    assert client.post(f"/api/missions/{m['id']}/cancel").status_code == 409
     view = client.get("/api/state").json()
     assert len(view["orders"]) == 1
     part = SCENARIOS[scenario]["part"]
@@ -89,6 +92,7 @@ def test_isolation_and_idempotency(app, client):
         assert other.get("/api/state").json()["missions"] == []
         assert other.get(f"/api/missions/{first['id']}/evidence").status_code == 404
         assert other.post(f"/api/missions/{first['id']}/stop").status_code == 404
+        assert other.post(f"/api/missions/{first['id']}/cancel").status_code == 404
 
 
 def test_rejection_does_not_reserve(app, client):
@@ -121,6 +125,107 @@ def test_stop_resume_preserves_physics(app, client):
     assert client.post(f"/api/missions/{mid}/resume").status_code == 200
     done = inspect(app, mid)
     assert done["status"] == "awaiting_approval", done.get("error")
+
+
+@pytest.mark.parametrize("commands", [("stop",), ("stop", "resume"), ("cancel",)])
+@pytest.mark.parametrize("fault", [False, True])
+def test_operator_command_wins_over_inflight_physics(
+    app, client, monkeypatch, commands, fault
+):
+    """Hold a real worker step while HTTP commands change the persisted run."""
+    mid = create(client)["id"]
+    for _ in range(3):
+        asyncio.run(app.state.advance(mid))
+    before = app.state.store.mission(mid)
+    before_replay = client.get(f"/api/missions/{mid}/replay").json()
+    step = Twin.step
+    entered, release = threading.Event(), threading.Event()
+
+    def held_step(twin, target):
+        entered.set()
+        assert release.wait(10), "Test did not release the physics worker"
+        if fault:
+            raise RuntimeError("Fault in superseded worker step")
+        return step(twin, target)
+
+    async def race():
+        task = asyncio.create_task(app.state.advance(mid))
+        try:
+            assert await asyncio.to_thread(entered.wait, 10)
+            for command in commands:
+                response = await asyncio.to_thread(
+                    client.post, f"/api/missions/{mid}/{command}"
+                )
+                assert response.status_code == 200, response.text
+        finally:
+            release.set()
+            await task
+
+    with monkeypatch.context() as patch:
+        patch.setattr(Twin, "step", held_step)
+        asyncio.run(race())
+
+    saved = app.state.store.mission(mid)
+    expected_status = {"stop": "paused", "resume": "navigating", "cancel": "canceled"}[
+        commands[-1]
+    ]
+    assert saved["status"] == expected_status
+    assert saved["pose"] == before["pose"]
+    assert saved["physics"] == before["physics"]
+    assert "error" not in saved
+    assert client.get(f"/api/missions/{mid}/replay").json() == before_replay
+    events = client.get(f"/api/missions/{mid}/evidence").json()["mission"]["events"]
+    assert not any(e["kind"] == "error" for e in events)
+
+    if expected_status == "canceled":
+        asyncio.run(app.state.advance(mid))
+        assert app.state.store.mission(mid) == saved
+    else:
+        if expected_status == "paused":
+            assert client.post(f"/api/missions/{mid}/resume").status_code == 200
+        # The resumed engine must start from the last committed checkpoint, not
+        # the discarded in-memory step (including the controller's LSTM state).
+        reference = Twin(before["blocked"], before["physics"])
+        expected_pose = reference.step(before["route"][before["waypoint"]])
+        asyncio.run(app.state.advance(mid))
+        resumed = app.state.store.mission(mid)
+        assert resumed["pose"] == pytest.approx(expected_pose, abs=1e-10)
+        assert resumed["physics"] == reference.snapshot()
+
+
+@pytest.mark.parametrize(
+    "phase", ["planning", "navigating", "paused", "awaiting_approval"]
+)
+def test_cancel_retains_evidence_and_releases_workspace(app, client, phase):
+    mid = create(client)["id"]
+    if phase == "awaiting_approval":
+        inspect(app, mid)
+    elif phase in {"navigating", "paused"}:
+        for _ in range(3):
+            asyncio.run(app.state.advance(mid))
+        if phase == "paused":
+            assert client.post(f"/api/missions/{mid}/stop").status_code == 200
+    before = client.get("/api/state").json()
+    response = client.post(f"/api/missions/{mid}/cancel")
+    assert response.status_code == 200
+    assert client.post(f"/api/missions/{mid}/cancel").json() == response.json()
+    asyncio.run(app.state.advance(mid))
+    after = client.get("/api/state").json()
+    assert after["inventory"] == before["inventory"]
+    assert after["orders"] == []
+    canceled = after["missions"][0]
+    assert canceled["status"] == "canceled"
+    assert canceled["pose"] == before["missions"][0]["pose"]
+    assert canceled.get("evidence") == before["missions"][0].get("evidence")
+    assert sum(e["kind"] == "canceled" for e in canceled["events"]) == 1
+    assert client.post(f"/api/missions/{mid}/resume").status_code == 409
+    assert (
+        client.post(
+            f"/api/missions/{mid}/decision", json={"action": "approve"}
+        ).status_code
+        == 409
+    )
+    assert create(client, "leak")["id"] != mid
 
 
 def test_restart_pauses_and_retains_data(tmp_path):

@@ -1,0 +1,16 @@
+{
+  "base": "https://localhost:8448",
+  "deployment": "local-container",
+  "checks": [
+    "HTTPS with trusted local Caddy CA and proxy headers",
+    "same-origin writes and secure HttpOnly session cookie",
+    "foreign-origin writes and oversized requests rejected through proxy",
+    "two live SSE snapshots delivered without proxy buffering",
+    "container restart pauses at recorded checkpoint and resumes to inspection",
+    "approved work order and single reservation survive second restart"
+  ],
+  "status": "passed",
+  "mission": "654c3b6e66e8",
+  "order": "WO-654C3B",
+  "contacts": 0
+}

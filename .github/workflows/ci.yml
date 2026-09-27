@@ -26,3 +26,29 @@ jobs:
       - run: npm ci && npm run build
         working-directory: web
       - run: bash -n scripts/deploy.sh
+      - run: npx playwright install --with-deps chromium
+        working-directory: web
+      - name: Browser workflow, controls and mobile layout
+        run: |
+          mkdir -p artifacts
+          uvicorn backend.app:app --host 127.0.0.1 --port 8197 > artifacts/server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:8197/api/health > /dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          curl --fail --silent http://127.0.0.1:8197/api/health
+          npm run test:e2e --prefix web
+      - name: Browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-validation
+          path: |
+            artifacts/browser-report.json
+            artifacts/browser-evidence.json
+            artifacts/*.png
+            artifacts/server.log

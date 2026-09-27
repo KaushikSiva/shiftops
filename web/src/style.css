@@ -683,7 +683,8 @@ canvas {
   background: #fcf0d9;
 }
 .status-escalated,
-.status-rejected {
+.status-rejected,
+.status-canceled {
   color: #a9543c;
   background: #fbeae3;
 }

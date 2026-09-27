@@ -102,6 +102,7 @@ const statusNames: Record<string, string> = {
   paused: "Paused",
   complete: "Handoff complete",
   rejected: "Rejected",
+  canceled: "Canceled",
   escalated: "Needs intervention",
 };
 
@@ -167,25 +168,36 @@ function missionView(m: any) {
     "Approve handoff",
     "Work order",
   ];
+  const active = [
+    "planning",
+    "navigating",
+    "inspecting",
+    "awaiting_approval",
+    "paused",
+  ].includes(m.status);
   const stage =
-    m.status === "planning"
-      ? 0
-      : m.status === "navigating"
-        ? 1
-        : m.status === "inspecting"
+    m.status === "complete"
+      ? 5
+      : m.evidence
+        ? 3
+        : m.events.some((e: any) => e.kind === "arrival")
           ? 2
-          : m.status === "awaiting_approval"
-            ? 3
-            : m.status === "complete"
-              ? 5
-              : 1;
+          : 1;
+  const stageLabel =
+    m.status === "paused"
+      ? "Paused"
+      : m.status === "awaiting_approval"
+        ? "Awaiting your decision"
+        : "In progress";
   const evidence = m.evidence;
-  return `<div class="mission-content"><div class="mission-name"><span class="asset-id">${esc(m.scenario.asset)} / ${esc(m.id.slice(0, 6).toUpperCase())}</span>${badge(m.status)}<h3>${esc(m.scenario.name)}</h3><p>${esc(m.scenario.location)} · ${esc(m.scenario.priority)} priority</p></div><ol class="workflow">${stages.map((s, i) => `<li class="${i < stage ? "done" : i === stage ? "current" : ""}"><span>${i < stage ? icon("check") : String(i + 1).padStart(2, "0")}</span><div>${s}${i === stage ? "<small>In progress</small>" : ""}</div></li>`).join("")}</ol>
+  return `<div class="mission-content"><div class="mission-name"><span class="asset-id">${esc(m.scenario.asset)} / ${esc(m.id.slice(0, 6).toUpperCase())}</span>${badge(m.status)}<h3>${esc(m.scenario.name)}</h3><p>${esc(m.scenario.location)} · ${esc(m.scenario.priority)} priority</p></div><ol class="workflow">${stages.map((s, i) => `<li class="${i < stage ? "done" : i === stage && active ? "current" : ""}"><span>${i < stage ? icon("check") : String(i + 1).padStart(2, "0")}</span><div>${s}${i === stage && active ? `<small>${stageLabel}</small>` : ""}</div></li>`).join("")}</ol>
   ${evidence ? `<div class="evidence"><div class="small-heading">${icon("scan-eye")}INSPECTION EVIDENCE</div><div class="reading"><strong>${esc(evidence.value)}<small>${esc(evidence.unit)}</small></strong><span>${esc(evidence.sensor)}<small>Threshold ${esc(evidence.threshold)} ${esc(evidence.unit)}</small></span></div><p>${esc(evidence.rationale)}</p><small>Source: ${esc(evidence.source)}</small></div>` : `<div class="telemetry"><div><span>Distance walked</span><strong>${Number(m.distance).toFixed(1)} m</strong></div><div><span>Obstacle contacts</span><strong>${m.contacts}</strong></div><div><span>Simulation time</span><strong>${Math.floor(m.sim_seconds)} s</strong></div></div>`}
   ${m.status === "awaiting_approval" ? `<div class="approval"><h4>${m.proposal.action === "reserve" ? "Reserve part & create work order" : "Create purchase request"}</h4><p>${esc(m.proposal.part_name)} <b>$${m.proposal.estimated_cost}</b></p><small>${m.proposal.in_stock} in stock · ${m.proposal.action === "reserve" ? "1 will be reserved" : "No order sent to an external vendor"}</small><div class="approval-actions"><button class="primary" data-decision="approve" ${pending ? "disabled" : ""}>${icon("check")}Approve handoff</button><button class="text-button" data-decision="reject" ${pending ? "disabled" : ""}>Reject</button></div></div>` : ""}
   ${m.status === "complete" ? `<div class="completion">${icon("circle-check")}<div><strong>${esc(m.order)} created</strong><p>Handoff complete. ${m.proposal.action === "reserve" ? "Repair is pending with maintenance." : "Purchasing review is pending."}</p></div></div>` : ""}
   ${m.status === "paused" ? `<div class="notice">Simulation paused. The run and robot state are saved.<button class="secondary" id="resume">${icon("play")}Resume inspection</button></div>` : ""}
+  ${m.status === "canceled" || m.status === "rejected" ? `<div class="notice terminal-notice">${m.status === "canceled" ? "Inspection canceled." : "Handoff rejected."} Evidence is retained. No stock was reserved or work order created.</div>` : ""}
   ${m.error ? `<div class="notice error-notice">${esc(m.error)}</div>` : ""}
+  ${active ? `<button class="text-button cancel-button" id="cancel" ${pending ? "disabled" : ""}>${icon("x")}Cancel inspection</button>` : ""}
   <button class="text-button replay-button" id="replay" ${m.sim_seconds ? "" : "disabled"}>${icon("play")}Replay recorded motion</button><a class="evidence-link" href="/api/missions/${m.id}/evidence" download>${icon("download")}Export evidence bundle</a></div>`;
 }
 
@@ -373,6 +385,7 @@ document.addEventListener("click", async (event) => {
     if (
       button.id === "stop" ||
       button.id === "resume" ||
+      button.id === "cancel" ||
       button.dataset.decision
     ) {
       pending = true;
@@ -387,7 +400,9 @@ document.addEventListener("click", async (event) => {
           ? "Work order committed. Evidence and approval saved."
           : button.id === "stop"
             ? "Simulation paused. State saved."
-            : "Operation recorded.",
+            : button.id === "cancel"
+              ? "Inspection canceled. Evidence retained."
+              : "Operation recorded.",
       );
     }
   } catch (e) {

@@ -158,6 +158,54 @@ try {
     "mobile viewport has no horizontal overflow",
     "mobile intake dialog",
   );
+  await page.locator("#new-mission").click();
+  await page.locator('input[name="scenario"][value="stockout"]').check();
+  await page
+    .getByRole("button", { name: "Dispatch inspection", exact: true })
+    .click();
+  await page.waitForFunction(
+    () => document.querySelector("#robot-state")?.textContent === "En route",
+    {},
+    { timeout: 45000 },
+  );
+  await page.locator("#stop").click();
+  await page.locator("#resume").waitFor();
+  assert.equal(
+    await page.locator(".workflow .current small").textContent(),
+    "Paused",
+  );
+  await page.locator("#cancel").click();
+  await page.locator(".terminal-notice").waitFor();
+  assert.match(
+    await page.locator(".terminal-notice").textContent(),
+    /Inspection canceled/,
+  );
+  assert.equal(await page.locator(".workflow .current").count(), 0);
+  assert.equal(await page.locator("#resume").count(), 0);
+  const canceled = await page.evaluate(() =>
+    fetch("/api/state").then((r) => r.json()),
+  );
+  assert.equal(canceled.missions[0].status, "canceled");
+  assert.equal(canceled.orders.length, 1);
+  assert.deepEqual(canceled.inventory, completed.inventory);
+  assert.equal(
+    canceled.missions[0].events.filter((e) => e.kind === "canceled").length,
+    1,
+  );
+  await page.screenshot({
+    path: path.join(artifacts, "mobile-canceled.png"),
+    fullPage: true,
+  });
+  await page.reload();
+  await page.locator(".terminal-notice").waitFor();
+  await page.locator("#new-mission").click();
+  await page.locator("#intake").waitFor();
+  await page.locator("#close-intake").click();
+  report.checks.push(
+    "mobile cancellation retains evidence and inventory",
+    "canceled run persists after reload",
+    "paused and canceled workflow labels reflect actual state",
+  );
   assert.deepEqual(errors, []);
   assert.deepEqual(consoleErrors, []);
   report.checks.push("no browser errors");

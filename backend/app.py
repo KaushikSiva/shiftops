@@ -40,6 +40,18 @@ def create_app(db_path=None, run_worker=True):
     )
     engines = {}
 
+    def same_control_revision(db, mission, status):
+        """Check operator intent under the same lock used to commit a worker step."""
+        row = db.execute(
+            "SELECT state FROM missions WHERE id=?", (mission["id"],)
+        ).fetchone()
+        if not row:
+            return False
+        current = json.loads(row["state"])
+        return current["status"] == status and current.get(
+            "control_revision", 0
+        ) == mission.get("control_revision", 0)
+
     async def advance(mid):
         m = store.mission(mid)
         if not m or m["status"] not in {"planning", "navigating", "inspecting"}:
@@ -51,6 +63,8 @@ def create_app(db_path=None, run_worker=True):
                 m["waypoint"] = 1
                 m["status"] = "navigating"
                 with store.connect() as db:
+                    if not same_control_revision(db, m, "planning"):
+                        return
                     store.event(
                         db,
                         mid,
@@ -78,17 +92,18 @@ def create_app(db_path=None, run_worker=True):
                     store.save(db, m)
                 return
             if m["status"] == "navigating":
-                if mid not in engines:
-                    engines[mid] = await asyncio.to_thread(
-                        Twin, m["blocked"], m.get("physics")
+                revision = m.get("control_revision", 0)
+                if mid not in engines or engines[mid][0] != revision:
+                    engines[mid] = (
+                        revision,
+                        await asyncio.to_thread(Twin, m["blocked"], m.get("physics")),
                     )
-                twin = engines[mid]
+                twin = engines[mid][1]
+                with store.connect() as db:
+                    if not same_control_revision(db, m, "navigating"):
+                        engines.pop(mid, None)
+                        return
                 q = await asyncio.to_thread(twin.step, m["route"][m["waypoint"]])
-                # An operator may have stopped this run while physics was stepping.
-                latest = store.mission(mid)
-                if latest["status"] != "navigating":
-                    engines.pop(mid, None)
-                    return
                 m["pose"] = q
                 m["physics"] = twin.snapshot()
                 m["distance"] = round(twin.distance, 2)
@@ -99,6 +114,11 @@ def create_app(db_path=None, run_worker=True):
                     0.1 + 0.78 * m["sim_seconds"] / max(1, m["route_length"] / 0.45),
                 )
                 with store.connect() as db:
+                    # A pause/resume can leave the same status with newer intent.
+                    # Never commit its old in-flight pose or resurrect a canceled run.
+                    if not same_control_revision(db, m, "navigating"):
+                        engines.pop(mid, None)
+                        return
                     db.execute(
                         "INSERT OR REPLACE INTO poses VALUES(?,?,?,?)",
                         (mid, twin.counter, m["sim_seconds"], json.dumps(q)),
@@ -153,6 +173,8 @@ def create_app(db_path=None, run_worker=True):
                     "rationale": s["observation"],
                 }
                 with store.connect() as db:
+                    if not same_control_revision(db, m, "inspecting"):
+                        return
                     quantity = db.execute(
                         "SELECT quantity FROM inventory WHERE session=? AND part=?",
                         (m["session"], s["part"]),
@@ -191,11 +213,19 @@ def create_app(db_path=None, run_worker=True):
                     store.save(db, m)
                 engines.pop(mid, None)
         except Exception as exc:
-            latest = store.mission(mid)
-            if latest and latest["status"] not in {"paused", "complete", "rejected"}:
-                latest["status"] = "escalated"
-                latest["error"] = str(exc)
-                with store.connect() as db:
+            with store.connect() as db:
+                row = db.execute(
+                    "SELECT state FROM missions WHERE id=?", (mid,)
+                ).fetchone()
+                latest = json.loads(row["state"]) if row else None
+                if (
+                    latest
+                    and latest["status"] in {"planning", "navigating", "inspecting"}
+                    and latest.get("control_revision", 0)
+                    == m.get("control_revision", 0)
+                ):
+                    latest["status"] = "escalated"
+                    latest["error"] = str(exc)
                     store.event(
                         db,
                         mid,
@@ -215,6 +245,11 @@ def create_app(db_path=None, run_worker=True):
                         "SELECT id FROM missions WHERE json_extract(state,'$.status') IN ('planning','navigating','inspecting') ORDER BY created LIMIT 4"
                     )
                 ]
+            # A pause or cancellation between steps must also release its model.
+            # Resuming reconstructs it from the durable physics checkpoint.
+            for mid in list(engines):
+                if mid not in ids:
+                    engines.pop(mid, None)
             for mid in ids:
                 await advance(mid)
             await asyncio.sleep(float(os.getenv("SHIFTOPS_TICK_SECONDS", ".045")))
@@ -228,6 +263,7 @@ def create_app(db_path=None, run_worker=True):
                 if m["status"] in {"planning", "navigating", "inspecting"}:
                     m["resume_status"] = m["status"]
                     m["status"] = "paused"
+                    m["control_revision"] = m.get("control_revision", 0) + 1
                     store.event(
                         db,
                         m["id"],
@@ -396,6 +432,7 @@ def create_app(db_path=None, run_worker=True):
                 "note": body.note,
                 "blocked": body.blocked,
                 "status": "planning",
+                "control_revision": 0,
                 "created": time.time(),
                 "pose": [1, 1, 0.793, 1, 0, 0, 0] + [-0.1, 0, 0, 0.3, -0.2, 0] * 2,
                 "route": [],
@@ -438,6 +475,7 @@ def create_app(db_path=None, run_worker=True):
                 raise HTTPException(409, "This mission is not moving")
             m["resume_status"] = m["status"]
             m["status"] = "paused"
+            m["control_revision"] = m.get("control_revision", 0) + 1
             store.event(
                 db,
                 mid,
@@ -468,6 +506,7 @@ def create_app(db_path=None, run_worker=True):
                     429, "Simulation workers are busy. Try again shortly."
                 )
             m["status"] = m.pop("resume_status")
+            m["control_revision"] = m.get("control_revision", 0) + 1
             store.event(
                 db,
                 mid,
@@ -477,6 +516,33 @@ def create_app(db_path=None, run_worker=True):
             )
             store.save(db, m)
         return {"status": m["status"]}
+
+    @app.post("/api/missions/{mid}/cancel")
+    def cancel(mid: str, request: Request):
+        sid = session(request)
+        with store.connect() as db:
+            row = db.execute(
+                "SELECT state FROM missions WHERE id=? AND session=?", (mid, sid)
+            ).fetchone()
+            if not row:
+                raise HTTPException(404, "Mission not found")
+            m = json.loads(row["state"])
+            if m["status"] == "canceled":
+                return {"status": "canceled"}
+            if m["status"] not in ACTIVE:
+                raise HTTPException(409, "This mission has already finished")
+            m["status"] = "canceled"
+            m["control_revision"] = m.get("control_revision", 0) + 1
+            m.pop("resume_status", None)
+            store.event(
+                db,
+                mid,
+                "canceled",
+                "Operator canceled inspection",
+                {"inventory_reserved": False, "work_order_created": False},
+            )
+            store.save(db, m)
+        return {"status": "canceled"}
 
     @app.post("/api/missions/{mid}/decision")
     def decision(mid: str, body: Decision, request: Request):

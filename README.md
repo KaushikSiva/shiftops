@@ -35,8 +35,11 @@ the resulting work order and download its evidence. **Replay recorded motion**
 shows the actual poses captured during that run.
 
 The simulation runs faster than wall time; simulation time is shown separately.
-You can pause and resume a mission. A service restart pauses interrupted runs
-and retains their physics checkpoints for explicit operator resume.
+You can pause, resume or cancel a mission. Cancellation retains the audit record
+without reserving stock or creating a work order, and lets you dispatch another
+inspection. A service restart pauses interrupted runs and retains their physics
+checkpoints for explicit operator resume. Operator commands take precedence over
+older physics work still in flight.
 
 ## What the application actually does
 
@@ -116,7 +119,8 @@ npm run test:e2e
 ```
 
 Tests execute actual MuJoCo navigation for every scenario, then verify approvals,
-inventory accounting, idempotency, isolation, pause/resume and restart recovery.
+inventory accounting, idempotency, isolation, cancellation, pause/resume races
+and restart recovery.
 Browser checks exercise intake, live movement, approval, work orders, replay and
 mobile layout. Generated screenshots, videos and reports live in `artifacts/`.
 

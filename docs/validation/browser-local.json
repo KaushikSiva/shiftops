@@ -1,0 +1,26 @@
+{
+  "base": "http://127.0.0.1:8197",
+  "started": "2026-09-27T02:55:09.672Z",
+  "checks": [
+    "live CPU inspection",
+    "pause freezes persisted pose",
+    "resume reaches inspection",
+    "approval required",
+    "work order created",
+    "single inventory reservation",
+    "evidence download",
+    "activity events",
+    "recorded pose replay",
+    "state survives browser reload",
+    "mobile viewport has no horizontal overflow",
+    "mobile intake dialog",
+    "mobile cancellation retains evidence and inventory",
+    "canceled run persists after reload",
+    "paused and canceled workflow labels reflect actual state",
+    "no browser errors"
+  ],
+  "status": "passed",
+  "mission": "aef18e607251",
+  "errors": [],
+  "consoleErrors": []
+}
